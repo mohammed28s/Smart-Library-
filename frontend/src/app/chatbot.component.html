@@ -1,0 +1,42 @@
+<button class="chat-toggle" type="button" (click)="toggle()">
+  {{ isOpen ? 'Close Assistant' : 'AI Assistant' }}
+</button>
+
+<section class="chat-panel" *ngIf="isOpen">
+  <header>
+    <h3>SmartLibrary Assistant</h3>
+    <p>Ask questions or send feedback</p>
+  </header>
+
+  <div class="chat-body">
+    <article class="message" *ngFor="let message of messages" [class.user]="message.role === 'user'">
+      <p>{{ message.text }}</p>
+      <small *ngIf="message.provider">via {{ message.provider }}</small>
+    </article>
+  </div>
+
+  <form class="composer" (ngSubmit)="send()">
+    <input
+      type="text"
+      name="question"
+      placeholder="Type your question"
+      [(ngModel)]="question"
+      [disabled]="loading" />
+    <button type="submit" [disabled]="loading">{{ loading ? 'Sending...' : 'Send' }}</button>
+  </form>
+
+  <div class="feedback" *ngIf="messages.length > 1">
+    <label for="feedbackComment">Optional feedback</label>
+    <textarea
+      id="feedbackComment"
+      rows="2"
+      [(ngModel)]="feedbackComment"
+      name="feedbackComment"
+      [disabled]="sendingFeedback || lastFeedbackSent"
+      placeholder="Was this helpful?"></textarea>
+    <div class="feedback-actions">
+      <button type="button" (click)="sendFeedback(true)" [disabled]="sendingFeedback || lastFeedbackSent">Helpful</button>
+      <button type="button" (click)="sendFeedback(false)" [disabled]="sendingFeedback || lastFeedbackSent">Not helpful</button>
+    </div>
+  </div>
+</section>

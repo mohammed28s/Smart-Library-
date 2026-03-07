@@ -65,3 +65,15 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
   created_at TEXT NOT NULL,
   FOREIGN KEY(user_id) REFERENCES users(id)
 );
+
+-- Assistant feedback
+CREATE TABLE IF NOT EXISTS assistant_feedback (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  question TEXT NOT NULL,
+  answer TEXT NOT NULL,
+  helpful INTEGER NOT NULL,
+  comment TEXT,
+  created_at TEXT NOT NULL,
+  FOREIGN KEY(user_id) REFERENCES users(id)
+);

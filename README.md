@@ -51,6 +51,21 @@ Then open:
 - Frontend: http://localhost:4200
 - Backend health: http://localhost:8080/api/health
 
+### AI assistant (DeepSeek)
+
+The frontend includes an authenticated chatbot widget for questions and feedback.
+
+- If `DEEPSEEK_API_KEY` is set, backend calls DeepSeek Chat Completions API.
+- If not set, backend uses a local fallback assistant so chat still works.
+
+Set env vars:
+
+```bash
+export DEEPSEEK_BASE_URL=https://api.deepseek.com
+export DEEPSEEK_API_KEY=your_deepseek_api_key
+export DEEPSEEK_MODEL=deepseek-chat
+```
+
 ### Optional SMS (Twilio) configuration for Docker
 
 By default, SMS mode is `mock` (no real SMS sent). To enable real SMS:
