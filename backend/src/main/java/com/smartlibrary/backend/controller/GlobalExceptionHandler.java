@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -37,6 +38,25 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleIllegalArgument(IllegalArgumentException ex) {
         return Map.of("error", ex.getMessage());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleDataIntegrity(DataIntegrityViolationException ex) {
+        String message = ex.getMostSpecificCause() == null ? "" : ex.getMostSpecificCause().getMessage();
+        if (message.contains("users.username")) {
+            return Map.of("error", "User already exists: username is already used");
+        }
+        if (message.contains("users.email")) {
+            return Map.of("error", "User already exists: email is already used");
+        }
+        if (message.contains("users.phone")) {
+            return Map.of("error", "User already exists: phone is already used");
+        }
+        if (message.contains("UNIQUE constraint failed: users")) {
+            return Map.of("error", "User already exists");
+        }
+        return Map.of("error", "Data conflict");
     }
 
     @ExceptionHandler(BadCredentialsException.class)
