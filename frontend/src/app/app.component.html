@@ -1,0 +1,40 @@
+<main class="layout">
+  <aside class="sidebar" [class.open]="menuOpen" *ngIf="authService.isAuthenticated">
+    <div class="brand">
+      <p class="kicker">Platform</p>
+      <h1>{{ title }}</h1>
+      <p class="who">{{ authService.username }} · {{ authService.role }}</p>
+    </div>
+
+    <nav class="menu">
+      <a routerLink="/dashboard" routerLinkActive="active" (click)="closeMenu()">Dashboard</a>
+      <a routerLink="/books" routerLinkActive="active" (click)="closeMenu()">Books</a>
+      <a routerLink="/orders" routerLinkActive="active" (click)="closeMenu()">Orders</a>
+      <a routerLink="/order-items" routerLinkActive="active" (click)="closeMenu()">Order Items</a>
+      <a routerLink="/payments" routerLinkActive="active" (click)="closeMenu()">Payments</a>
+      <a routerLink="/users" routerLinkActive="active" *ngIf="authService.role === 'WORKER'" (click)="closeMenu()">
+        Users
+      </a>
+    </nav>
+
+    <button class="logout" type="button" (click)="logout()">Logout</button>
+  </aside>
+
+  <section class="content">
+    <header class="topbar">
+      <button
+        class="menu-btn"
+        type="button"
+        *ngIf="authService.isAuthenticated"
+        (click)="menuOpen = !menuOpen">
+        Menu
+      </button>
+      <div class="auth-links" *ngIf="!authService.isAuthenticated">
+        <a routerLink="/login" routerLinkActive="active">Login</a>
+        <a routerLink="/register" routerLinkActive="active">Register</a>
+      </div>
+    </header>
+    <router-outlet></router-outlet>
+  </section>
+</main>
+<app-toast-center></app-toast-center>

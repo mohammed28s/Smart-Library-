@@ -1,0 +1,36 @@
+<section class="single-card">
+  <article class="card">
+    <p class="eyebrow">Create Account</p>
+    <h2>Register</h2>
+    <p class="status error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    <label>
+      Username
+      <input type="text" [(ngModel)]="registerUsername" />
+    </label>
+    <label>
+      Email
+      <input type="email" [(ngModel)]="registerEmail" />
+    </label>
+    <label>
+      Phone (optional, e.g. +9689xxxxxxx)
+      <input type="tel" [(ngModel)]="registerPhone" />
+    </label>
+    <label>
+      Password
+      <input type="password" [(ngModel)]="registerPassword" />
+    </label>
+    <label>
+      Full Name (optional)
+      <input type="text" [(ngModel)]="registerFullName" />
+    </label>
+    <button
+      type="button"
+      (click)="register()"
+      [disabled]="loading || !registerUsername.trim() || !registerEmail.trim() || !registerPassword">
+      {{ loading ? 'Please wait...' : 'Create Account' }}
+    </button>
+    <p class="hint">
+      Already have an account? <a routerLink="/login">Login</a>
+    </p>
+  </article>
+</section>

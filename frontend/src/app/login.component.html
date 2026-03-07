@@ -1,0 +1,26 @@
+<section class="single-card">
+  <article class="card">
+    <p class="eyebrow">Welcome Back</p>
+    <h2>Login</h2>
+    <p class="status error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    <p class="status success" *ngIf="successMessage">{{ successMessage }}</p>
+    <label>
+      Username or Email
+      <input type="text" [(ngModel)]="loginIdentifier" />
+    </label>
+    <label>
+      Password
+      <input type="password" [(ngModel)]="loginPassword" />
+    </label>
+    <button
+      type="button"
+      (click)="login()"
+      [disabled]="loading || !loginIdentifier.trim() || !loginPassword">
+      {{ loading ? 'Please wait...' : 'Login' }}
+    </button>
+    <p class="hint"><a routerLink="/forgot-password">Forgot password?</a></p>
+    <p class="hint">
+      New user? <a routerLink="/register">Create an account</a>
+    </p>
+  </article>
+</section>

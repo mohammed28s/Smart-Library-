@@ -1,0 +1,11 @@
+<section class="toast-wrap">
+  <article
+    class="toast"
+    *ngFor="let toast of toastService.messages$ | async"
+    [class.success]="toast.type === 'success'"
+    [class.error]="toast.type === 'error'"
+    [class.info]="toast.type === 'info'">
+    <span>{{ toast.text }}</span>
+    <button type="button" (click)="toastService.dismiss(toast.id)">x</button>
+  </article>
+</section>

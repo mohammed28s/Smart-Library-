@@ -1,0 +1,73 @@
+.single-card {
+  display: grid;
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+.card {
+  background: linear-gradient(160deg, #ffffff 70%, #f2fffb 100%);
+  border: 1px solid var(--surface-stroke);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+h2 {
+  margin: 0 0 8px;
+  font-family: 'Fraunces', serif;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.92rem;
+}
+
+input {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+}
+
+button {
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 12px;
+  background: #0f766e;
+  color: #ffffff;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.status {
+  border-radius: 8px;
+  padding: 9px 12px;
+  margin: 8px 0 10px;
+}
+
+.status.error {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.hint {
+  margin: 12px 0 0;
+  color: var(--muted);
+}

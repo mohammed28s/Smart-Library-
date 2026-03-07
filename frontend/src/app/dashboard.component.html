@@ -1,0 +1,47 @@
+<section class="page-head">
+  <div>
+    <p class="eyebrow">Overview</p>
+    <h2>Library Operations Dashboard</h2>
+  </div>
+  <button type="button" (click)="refresh()" [disabled]="loading">
+    {{ loading ? 'Refreshing...' : 'Refresh Metrics' }}
+  </button>
+</section>
+
+<p class="status error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+<section class="metrics-grid" *ngIf="loading">
+  <article class="metric-card skeleton" *ngFor="let _ of [1,2,3,4,5,6]"></article>
+</section>
+
+<section class="metrics-grid" *ngIf="!loading">
+  <article class="metric-card">
+    <p>Total Books</p>
+    <h3>{{ totalBooks }}</h3>
+  </article>
+  <article class="metric-card">
+    <p>Total Users</p>
+    <h3>{{ isWorker ? totalUsers : 'N/A' }}</h3>
+  </article>
+  <article class="metric-card">
+    <p>Total Orders</p>
+    <h3>{{ totalOrders }}</h3>
+  </article>
+  <article class="metric-card">
+    <p>Order Items</p>
+    <h3>{{ totalOrderItems }}</h3>
+  </article>
+  <article class="metric-card">
+    <p>Payments</p>
+    <h3>{{ totalPayments }}</h3>
+  </article>
+  <article class="metric-card">
+    <p>Inventory Value</p>
+    <h3>${{ inventoryValue | number: '1.2-2' }}</h3>
+  </article>
+</section>
+
+<section class="spotlight-card" *ngIf="!loading">
+  <h3>Revenue (Succeeded Payments)</h3>
+  <p class="spotlight">${{ totalPaidRevenue | number: '1.2-2' }}</p>
+</section>

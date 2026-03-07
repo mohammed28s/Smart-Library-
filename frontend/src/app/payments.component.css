@@ -1,0 +1,159 @@
+.grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 14px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--surface-stroke);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow-soft);
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.tools {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tools input {
+  width: 200px;
+  margin-top: 0;
+}
+
+h2 {
+  margin: 0;
+}
+
+.form-grid {
+  display: grid;
+  gap: 9px;
+}
+
+label {
+  display: block;
+  font-size: 0.9rem;
+}
+
+input,
+select {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px;
+  font-family: inherit;
+}
+
+button {
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+.secondary {
+  background: #d9e2f1;
+  color: #1e3a5f;
+}
+
+.danger {
+  background: #ef4444;
+}
+
+.table-wrap {
+  overflow: auto;
+}
+
+.skeleton-table {
+  height: 56px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #eef2f7 25%, #f8fafc 37%, #eef2f7 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.2s ease infinite;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #e2e8f0;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.empty {
+  text-align: center;
+  color: var(--muted);
+}
+
+.status {
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.status.error {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.status.success {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.pager {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tools {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tools input {
+    width: 100%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}

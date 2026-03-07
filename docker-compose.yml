@@ -1,0 +1,27 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: smartlibrary-backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - backend_data:/app/data
+    environment:
+      - JWT_SECRET=${JWT_SECRET:-smartlibrary-jwt-secret-key-please-change-this-in-production-2026}
+      - SMS_MODE=${SMS_MODE:-mock}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID:-}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN:-}
+      - TWILIO_FROM_NUMBER=${TWILIO_FROM_NUMBER:-}
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: smartlibrary-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+volumes:
+  backend_data:

@@ -1,0 +1,140 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+}
+
+.sidebar {
+  background: linear-gradient(180deg, #0b1220 0%, #101a2f 100%);
+  color: #e6edf8;
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.brand h1 {
+  margin: 4px 0 2px;
+  font-size: 1.45rem;
+  font-family: 'Fraunces', serif;
+}
+
+.kicker {
+  margin: 0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8aa0c4;
+}
+
+.who {
+  margin: 0;
+  color: #c1d3f0;
+  font-size: 0.86rem;
+}
+
+.menu {
+  margin-top: 20px;
+  display: grid;
+  gap: 6px;
+}
+
+.menu a {
+  text-decoration: none;
+  color: #d7e3f8;
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition: background 0.2s ease;
+}
+
+.menu a:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.menu a.active {
+  background: linear-gradient(135deg, #2d4d7d, #345e9a);
+}
+
+.logout {
+  margin-top: auto;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #f97316;
+  color: #fff;
+  cursor: pointer;
+}
+
+.content {
+  padding: 24px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+}
+
+.auth-links {
+  display: flex;
+  gap: 10px;
+}
+
+.auth-links a {
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid var(--surface-stroke);
+  background: var(--surface);
+  padding: 8px 12px;
+  border-radius: 999px;
+}
+
+.auth-links a.active {
+  background: #0f766e;
+  color: #fff;
+}
+
+.menu-btn {
+  display: none;
+}
+
+@media (max-width: 980px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 260px;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    z-index: 20;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .menu-btn {
+    display: inline-flex;
+    border: 0;
+    border-radius: 999px;
+    background: #0f172a;
+    color: #fff;
+    padding: 8px 12px;
+  }
+
+  .content {
+    padding: 16px;
+  }
+
+  .topbar {
+    justify-content: space-between;
+  }
+}
