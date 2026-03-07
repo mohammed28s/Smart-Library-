@@ -39,9 +39,30 @@
     <p>Inventory Value</p>
     <h3>${{ inventoryValue | number: '1.2-2' }}</h3>
   </article>
+  <article class="metric-card" *ngIf="isWorker">
+    <p>Available Stock</p>
+    <h3>{{ availableStock }}</h3>
+  </article>
+  <article class="metric-card" *ngIf="isWorker">
+    <p>Sold Books</p>
+    <h3>{{ soldBooks }}</h3>
+  </article>
+  <article class="metric-card" *ngIf="isWorker">
+    <p>Rented Books</p>
+    <h3>{{ rentedBooks }}</h3>
+  </article>
+  <article class="metric-card" *ngIf="isWorker">
+    <p>Purchases</p>
+    <h3>{{ purchaseCount }}</h3>
+  </article>
+  <article class="metric-card" *ngIf="isWorker">
+    <p>Rentals</p>
+    <h3>{{ rentalCount }}</h3>
+  </article>
 </section>
 
 <section class="spotlight-card" *ngIf="!loading">
   <h3>Revenue (Succeeded Payments)</h3>
   <p class="spotlight">${{ totalPaidRevenue | number: '1.2-2' }}</p>
+  <p class="eyebrow" *ngIf="isWorker">Daily Revenue: ${{ dailyRevenue | number: '1.2-2' }}</p>
 </section>

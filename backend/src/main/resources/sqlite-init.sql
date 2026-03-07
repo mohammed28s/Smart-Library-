@@ -25,12 +25,15 @@ CREATE TABLE IF NOT EXISTS orders (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER,
   total REAL,
-  status TEXT, -- 'CREATED','PAID','CANCELLED','REFUNDED'
+  status TEXT, -- 'CREATED','PAID','REFUND_REQUESTED','CANCELLED','REFUNDED'
   type TEXT,   -- 'BUY' or 'RENT'
   barcode TEXT,
+  rental_start_date TEXT,
+  due_date TEXT,
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY(user_id) REFERENCES users(id)
 );
+CREATE UNIQUE INDEX IF NOT EXISTS ux_orders_barcode ON orders(barcode);
 
 -- Each book in an order
 CREATE TABLE IF NOT EXISTS order_items (

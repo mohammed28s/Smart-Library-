@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { forkJoin, of } from 'rxjs';
+import { AnalyticsService } from './analytics.service';
 import { AuthService } from './auth.service';
 import { BooksService } from './books.service';
 import { OrderItemsService } from './order-items.service';
@@ -26,10 +27,17 @@ export class DashboardComponent implements OnInit {
   totalPayments = 0;
   inventoryValue = 0;
   totalPaidRevenue = 0;
+  availableStock = 0;
+  rentedBooks = 0;
+  soldBooks = 0;
+  dailyRevenue = 0;
+  purchaseCount = 0;
+  rentalCount = 0;
   isWorker = false;
 
   constructor(
     private readonly authService: AuthService,
+    private readonly analyticsService: AnalyticsService,
     private readonly booksService: BooksService,
     private readonly usersService: UsersService,
     private readonly ordersService: OrdersService,
@@ -46,14 +54,22 @@ export class DashboardComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
+    const metricsRequest = this.isWorker
+      ? forkJoin({
+          inventory: this.analyticsService.getInventoryMetrics(),
+          revenue: this.analyticsService.getRevenueMetrics()
+        })
+      : of(null);
+
     forkJoin({
       books: this.booksService.getBooks(),
       users: this.isWorker ? this.usersService.getUsers() : of([]),
       orders: this.ordersService.getOrders(),
       orderItems: this.orderItemsService.getOrderItems(),
-      payments: this.paymentsService.getPayments()
+      payments: this.paymentsService.getPayments(),
+      analytics: metricsRequest
     }).subscribe({
-      next: ({ books, users, orders, orderItems, payments }) => {
+      next: ({ books, users, orders, orderItems, payments, analytics }) => {
         this.totalBooks = books.length;
         this.totalUsers = users.length;
         this.totalOrders = orders.length;
@@ -63,6 +79,15 @@ export class DashboardComponent implements OnInit {
         this.totalPaidRevenue = payments
           .filter((payment) => payment.status === 'SUCCEEDED')
           .reduce((sum, payment) => sum + (payment.amount || 0), 0);
+
+        if (this.isWorker && analytics) {
+          this.availableStock = analytics.inventory.availableStock;
+          this.rentedBooks = analytics.inventory.rentedBooks;
+          this.soldBooks = analytics.inventory.soldBooks;
+          this.dailyRevenue = analytics.revenue.dailyRevenue;
+          this.purchaseCount = analytics.revenue.purchaseCount;
+          this.rentalCount = analytics.revenue.rentalCount;
+        }
         this.loading = false;
       },
       error: (error) => {

@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,12 @@ public class LibraryOrder {
     private OrderType type;
 
     private String barcode;
+
+    @Column(name = "rental_start_date")
+    private LocalDate rentalStartDate;
+
+    @Column(name = "due_date")
+    private LocalDate dueDate;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -104,6 +111,22 @@ public class LibraryOrder {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDate getRentalStartDate() {
+        return rentalStartDate;
+    }
+
+    public void setRentalStartDate(LocalDate rentalStartDate) {
+        this.rentalStartDate = rentalStartDate;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
     }
 
     public List<OrderItem> getItems() {

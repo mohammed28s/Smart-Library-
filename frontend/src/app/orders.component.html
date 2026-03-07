@@ -22,6 +22,14 @@
           <option *ngFor="let type of orderTypes" [value]="type">{{ type }}</option>
         </select>
       </label>
+      <label *ngIf="form.type === 'RENT'">
+        Rental Start Date
+        <input type="date" [(ngModel)]="form.rentalStartDate" name="rentalStartDate" required />
+      </label>
+      <label *ngIf="form.type === 'RENT'">
+        Due Date
+        <input type="date" [(ngModel)]="form.dueDate" name="dueDate" required />
+      </label>
       <label class="full">Barcode <input type="text" [(ngModel)]="form.barcode" name="barcode" /></label>
       <button type="submit" [disabled]="saving">{{ saving ? 'Saving...' : editingId ? 'Update Order' : 'Create Order' }}</button>
     </form>
@@ -35,6 +43,13 @@
         <button type="button" (click)="load()" [disabled]="loading">{{ loading ? 'Refreshing...' : 'Refresh' }}</button>
       </div>
     </div>
+    <div class="tools" *ngIf="isWorker" style="margin-bottom: 10px">
+      <input type="text" [(ngModel)]="scanBarcode" placeholder="Scan barcode value..." />
+      <button type="button" (click)="scanOrderBarcode()">Validate Barcode</button>
+    </div>
+    <p class="status success" *ngIf="scannedOrder">
+      Barcode matched Order #{{ scannedOrder.id }} ({{ scannedOrder.type }} / {{ scannedOrder.status }})
+    </p>
     <div class="skeleton-table" *ngIf="loading"></div>
     <div class="table-wrap">
       <table>
@@ -45,6 +60,7 @@
             <th>Total</th>
             <th>Status</th>
             <th>Type</th>
+            <th>Rent Window</th>
             <th>Created</th>
             <th></th>
           </tr>
@@ -56,14 +72,23 @@
             <td>${{ order.total | number:'1.2-2' }}</td>
             <td>{{ order.status }}</td>
             <td>{{ order.type }}</td>
+            <td>{{ order.rentalStartDate || '-' }} → {{ order.dueDate || '-' }}</td>
             <td>{{ order.createdAt ? (order.createdAt | date: 'medium') : 'N/A' }}</td>
             <td class="actions">
               <button class="secondary" type="button" (click)="edit(order)">Edit</button>
+              <button type="button" (click)="cancel(order)" *ngIf="order.status === 'CREATED'">Cancel</button>
+              <button type="button" (click)="requestRefund(order)" *ngIf="order.status === 'PAID'">Refund</button>
+              <button
+                type="button"
+                (click)="approveRefund(order)"
+                *ngIf="isWorker && order.status === 'REFUND_REQUESTED'">
+                Approve Refund
+              </button>
               <button class="danger" type="button" (click)="remove(order)">Delete</button>
             </td>
           </tr>
           <tr *ngIf="!filteredOrders.length && !loading">
-            <td colspan="7" class="empty">No orders yet.</td>
+            <td colspan="8" class="empty">No orders yet.</td>
           </tr>
         </tbody>
       </table>

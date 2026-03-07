@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +38,12 @@ public class LibraryOrderController {
         return libraryOrderService.findById(id);
     }
 
+    @GetMapping("/barcode/{barcode}")
+    @PreAuthorize("hasRole('WORKER')")
+    public LibraryOrderDto findByBarcode(@PathVariable String barcode) {
+        return libraryOrderService.findByBarcode(barcode);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public LibraryOrderDto create(@Valid @RequestBody LibraryOrderDto dto) {
@@ -46,6 +53,22 @@ public class LibraryOrderController {
     @PutMapping("/{id}")
     public LibraryOrderDto update(@PathVariable Long id, @Valid @RequestBody LibraryOrderDto dto) {
         return libraryOrderService.update(id, dto);
+    }
+
+    @PostMapping("/{id}/cancel")
+    public LibraryOrderDto cancel(@PathVariable Long id) {
+        return libraryOrderService.cancelOrder(id);
+    }
+
+    @PostMapping("/{id}/refund-request")
+    public LibraryOrderDto requestRefund(@PathVariable Long id) {
+        return libraryOrderService.requestRefund(id);
+    }
+
+    @PostMapping("/{id}/refund-approve")
+    @PreAuthorize("hasRole('WORKER')")
+    public LibraryOrderDto approveRefund(@PathVariable Long id) {
+        return libraryOrderService.approveRefund(id);
     }
 
     @DeleteMapping("/{id}")

@@ -5,6 +5,7 @@ import com.smartlibrary.backend.entity.enums.OrderType;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class LibraryOrderDto {
@@ -25,6 +26,8 @@ public class LibraryOrderDto {
 
     @Size(max = 255, message = "barcode must be at most 255 characters")
     private String barcode;
+    private LocalDate rentalStartDate;
+    private LocalDate dueDate;
     private LocalDateTime createdAt;
 
     public Long getId() {
@@ -81,5 +84,21 @@ public class LibraryOrderDto {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDate getRentalStartDate() {
+        return rentalStartDate;
+    }
+
+    public void setRentalStartDate(LocalDate rentalStartDate) {
+        this.rentalStartDate = rentalStartDate;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
     }
 }

@@ -21,6 +21,22 @@ export class OrdersService {
     return this.http.put<LibraryOrder>(`${this.apiBaseUrl}/api/orders/${id}`, payload);
   }
 
+  cancelOrder(id: number): Observable<LibraryOrder> {
+    return this.http.post<LibraryOrder>(`${this.apiBaseUrl}/api/orders/${id}/cancel`, {});
+  }
+
+  requestRefund(id: number): Observable<LibraryOrder> {
+    return this.http.post<LibraryOrder>(`${this.apiBaseUrl}/api/orders/${id}/refund-request`, {});
+  }
+
+  approveRefund(id: number): Observable<LibraryOrder> {
+    return this.http.post<LibraryOrder>(`${this.apiBaseUrl}/api/orders/${id}/refund-approve`, {});
+  }
+
+  scanBarcode(barcode: string): Observable<LibraryOrder> {
+    return this.http.get<LibraryOrder>(`${this.apiBaseUrl}/api/orders/barcode/${encodeURIComponent(barcode)}`);
+  }
+
   deleteOrder(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiBaseUrl}/api/orders/${id}`);
   }

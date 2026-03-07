@@ -18,19 +18,30 @@ public class SqliteSchemaMigration implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        List<String> columns = jdbcTemplate.query(
+        List<String> userColumns = jdbcTemplate.query(
                 "PRAGMA table_info(users)",
                 (rs, rowNum) -> rs.getString("name"));
 
-        if (!columns.contains("email")) {
+        if (!userColumns.contains("email")) {
             executeWithRetry("ALTER TABLE users ADD COLUMN email TEXT");
         }
-        if (!columns.contains("phone")) {
+        if (!userColumns.contains("phone")) {
             executeWithRetry("ALTER TABLE users ADD COLUMN phone TEXT");
+        }
+
+        List<String> orderColumns = jdbcTemplate.query(
+                "PRAGMA table_info(orders)",
+                (rs, rowNum) -> rs.getString("name"));
+        if (!orderColumns.contains("rental_start_date")) {
+            executeWithRetry("ALTER TABLE orders ADD COLUMN rental_start_date TEXT");
+        }
+        if (!orderColumns.contains("due_date")) {
+            executeWithRetry("ALTER TABLE orders ADD COLUMN due_date TEXT");
         }
 
         executeWithRetry("CREATE UNIQUE INDEX IF NOT EXISTS ux_users_email ON users(email)");
         executeWithRetry("CREATE UNIQUE INDEX IF NOT EXISTS ux_users_phone ON users(phone)");
+        executeWithRetry("CREATE UNIQUE INDEX IF NOT EXISTS ux_orders_barcode ON orders(barcode)");
         executeWithRetry("""
                 CREATE TABLE IF NOT EXISTS password_reset_tokens (
                   id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -1,6 +1,6 @@
 export type UserRole = 'USER' | 'WORKER';
 export type OrderType = 'BUY' | 'RENT';
-export type OrderStatus = 'CREATED' | 'PAID' | 'CANCELLED' | 'REFUNDED';
+export type OrderStatus = 'CREATED' | 'PAID' | 'REFUND_REQUESTED' | 'CANCELLED' | 'REFUNDED';
 export type PaymentStatus = 'SUCCEEDED' | 'REFUNDED';
 
 export interface Book {
@@ -31,6 +31,8 @@ export interface LibraryOrder {
   status: OrderStatus;
   type: OrderType;
   barcode?: string | null;
+  rentalStartDate?: string | null;
+  dueDate?: string | null;
   createdAt?: string;
 }
 
@@ -50,4 +52,18 @@ export interface Payment {
   amount: number;
   status: PaymentStatus;
   createdAt?: string;
+}
+
+export interface InventoryMetrics {
+  totalBooks: number;
+  availableStock: number;
+  rentedBooks: number;
+  soldBooks: number;
+}
+
+export interface RevenueMetrics {
+  totalRevenue: number;
+  dailyRevenue: number;
+  purchaseCount: number;
+  rentalCount: number;
 }
