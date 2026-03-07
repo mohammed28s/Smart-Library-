@@ -3,6 +3,9 @@
     <p class="eyebrow">Welcome Back</p>
     <h2>Login</h2>
     <p class="status error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    <ul class="status error-list" *ngIf="validationErrors.length > 0">
+      <li *ngFor="let err of validationErrors">{{ err }}</li>
+    </ul>
     <p class="status success" *ngIf="successMessage">{{ successMessage }}</p>
     <label>
       Username or Email

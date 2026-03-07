@@ -19,6 +19,7 @@ export class LoginComponent {
   loading = false;
   errorMessage = '';
   successMessage = '';
+  validationErrors: string[] = [];
 
   constructor(
     private readonly authService: AuthService,
@@ -38,8 +39,14 @@ export class LoginComponent {
   }
 
   login(): void {
-    this.loading = true;
     this.clearMessages();
+    this.validationErrors = this.validateForm();
+    if (this.validationErrors.length > 0) {
+      this.toastService.error(this.validationErrors[0]);
+      return;
+    }
+
+    this.loading = true;
 
     this.authService
       .login({
@@ -53,6 +60,7 @@ export class LoginComponent {
           this.router.navigateByUrl('/dashboard');
         },
         error: (error) => {
+          this.validationErrors = this.extractBackendDetails(error);
           this.errorMessage = error?.error?.error || 'Login failed.';
           this.toastService.error(this.errorMessage);
           this.loading = false;
@@ -62,5 +70,35 @@ export class LoginComponent {
 
   private clearMessages(): void {
     this.errorMessage = '';
+    this.validationErrors = [];
+  }
+
+  private validateForm(): string[] {
+    const errors: string[] = [];
+    const identifier = this.loginIdentifier.trim();
+    const password = this.loginPassword;
+
+    if (!identifier) {
+      errors.push('Username or email is required.');
+    } else {
+      const usernameOk = /^[A-Za-z]{3,30}$/.test(identifier);
+      const emailOk = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(identifier);
+      if (!usernameOk && !emailOk) {
+        errors.push('Username must be 3-30 letters only, or enter a valid email address.');
+      }
+    }
+
+    if (!password) {
+      errors.push('Password is required.');
+    } else if (password.length < 8) {
+      errors.push('Password must be at least 8 characters.');
+    }
+
+    return errors;
+  }
+
+  private extractBackendDetails(error: unknown): string[] {
+    const details = (error as { error?: { details?: string[] } })?.error?.details;
+    return Array.isArray(details) ? details : [];
   }
 }
