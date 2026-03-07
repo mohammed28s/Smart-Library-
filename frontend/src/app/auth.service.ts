@@ -8,7 +8,7 @@ export interface AuthResponse {
   username: string;
   email: string | null;
   fullName: string | null;
-  role: 'USER' | 'WORKER';
+  role: 'USER' | 'WORKER' | 'GUEST';
 }
 
 export interface ForgotPasswordResponse {
@@ -31,6 +31,7 @@ export class AuthService {
   private readonly tokenKey = 'smartlibrary_token';
   private readonly usernameKey = 'smartlibrary_username';
   private readonly roleKey = 'smartlibrary_role';
+  private readonly guestKey = 'smartlibrary_guest';
 
   private readonly tokenSubject = new BehaviorSubject<string>(localStorage.getItem(this.tokenKey) ?? '');
   readonly token$ = this.tokenSubject.asObservable();
@@ -49,8 +50,16 @@ export class AuthService {
     return localStorage.getItem(this.roleKey) ?? '';
   }
 
+  get isGuest(): boolean {
+    return localStorage.getItem(this.guestKey) === '1';
+  }
+
   get isAuthenticated(): boolean {
     return this.token.length > 0;
+  }
+
+  get isSessionActive(): boolean {
+    return this.isAuthenticated || this.isGuest;
   }
 
   register(payload: {
@@ -98,6 +107,15 @@ export class AuthService {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.usernameKey);
     localStorage.removeItem(this.roleKey);
+    localStorage.removeItem(this.guestKey);
+    this.tokenSubject.next('');
+  }
+
+  continueAsGuest(): void {
+    localStorage.removeItem(this.tokenKey);
+    localStorage.setItem(this.usernameKey, 'Guest');
+    localStorage.setItem(this.roleKey, 'GUEST');
+    localStorage.setItem(this.guestKey, '1');
     this.tokenSubject.next('');
   }
 
@@ -105,6 +123,7 @@ export class AuthService {
     localStorage.setItem(this.tokenKey, response.token);
     localStorage.setItem(this.usernameKey, response.username);
     localStorage.setItem(this.roleKey, response.role);
+    localStorage.removeItem(this.guestKey);
     this.tokenSubject.next(response.token);
   }
 }

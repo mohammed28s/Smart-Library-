@@ -8,6 +8,7 @@ import { OrderItemsComponent } from './order-items.component';
 import { OrdersComponent } from './orders.component';
 import { PaymentsComponent } from './payments.component';
 import { RegisterComponent } from './register.component';
+import { sessionGuard } from './session.guard';
 import { UsersComponent } from './users.component';
 import { workerGuard } from './worker.guard';
 
@@ -17,7 +18,7 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
-  { path: 'books', component: BooksComponent, canActivate: [authGuard] },
+  { path: 'books', component: BooksComponent, canActivate: [sessionGuard] },
   { path: 'orders', component: OrdersComponent, canActivate: [authGuard] },
   { path: 'order-items', component: OrderItemsComponent, canActivate: [authGuard] },
   { path: 'payments', component: PaymentsComponent, canActivate: [authGuard] },

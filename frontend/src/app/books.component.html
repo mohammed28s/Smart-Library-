@@ -1,5 +1,5 @@
 <section class="section-grid">
-  <article class="panel">
+  <article class="panel" *ngIf="canManageBooks; else guestInfo">
     <div class="section-title">
       <div>
         <p class="eyebrow">Catalog</p>
@@ -42,6 +42,18 @@
     </form>
   </article>
 
+  <ng-template #guestInfo>
+    <article class="panel">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">Guest Access</p>
+          <h2>Browse Mode</h2>
+        </div>
+      </div>
+      <p class="muted">You are exploring as a guest. Register or login to add, edit, or delete books.</p>
+    </article>
+  </ng-template>
+
   <article class="panel">
     <div class="section-title">
       <div>
@@ -79,8 +91,8 @@
         <p>Barcode: <code>{{ book.barcode }}</code></p>
 
         <div class="actions">
-          <button class="secondary" type="button" (click)="startEdit(book)">Edit</button>
-          <button class="danger" type="button" (click)="deleteBook(book)">Delete</button>
+          <button class="secondary" type="button" (click)="startEdit(book)" *ngIf="canManageBooks">Edit</button>
+          <button class="danger" type="button" (click)="deleteBook(book)" *ngIf="canManageBooks">Delete</button>
           <button type="button" (click)="loadBarcode(book)" [disabled]="book.barcodeLoading">
             {{ book.barcodeLoading ? 'Loading...' : 'Barcode' }}
           </button>

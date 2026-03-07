@@ -32,6 +32,10 @@ export class BooksComponent implements OnInit, OnDestroy {
   editingId: number | null = null;
   saving = false;
 
+  get canManageBooks(): boolean {
+    return this.authService.isAuthenticated;
+  }
+
   constructor(
     private readonly booksService: BooksService,
     private readonly authService: AuthService,
@@ -71,6 +75,11 @@ export class BooksComponent implements OnInit, OnDestroy {
   }
 
   submitBook(): void {
+    if (!this.canManageBooks) {
+      this.errorMessage = 'Guest mode is read-only. Login to manage books.';
+      this.toastService.info(this.errorMessage);
+      return;
+    }
     this.saving = true;
     this.errorMessage = '';
     this.successMessage = '';
@@ -105,6 +114,10 @@ export class BooksComponent implements OnInit, OnDestroy {
   }
 
   startEdit(book: BookView): void {
+    if (!this.canManageBooks) {
+      this.toastService.info('Guest mode is read-only. Login to edit books.');
+      return;
+    }
     this.editingId = book.id || null;
     this.form = {
       title: book.title,
@@ -119,6 +132,10 @@ export class BooksComponent implements OnInit, OnDestroy {
   }
 
   deleteBook(book: BookView): void {
+    if (!this.canManageBooks) {
+      this.toastService.info('Guest mode is read-only. Login to delete books.');
+      return;
+    }
     if (!book.id || !confirm(`Delete "${book.title}"?`)) {
       return;
     }

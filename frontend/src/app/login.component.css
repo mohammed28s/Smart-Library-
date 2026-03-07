@@ -56,6 +56,12 @@ button:disabled {
   cursor: default;
 }
 
+.secondary {
+  background: #d9e2f1;
+  color: #1e3a5f;
+  margin-left: 8px;
+}
+
 .status {
   border-radius: 8px;
   padding: 9px 12px;

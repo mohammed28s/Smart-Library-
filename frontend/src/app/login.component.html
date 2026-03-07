@@ -21,6 +21,9 @@
       [disabled]="loading || !loginIdentifier.trim() || !loginPassword">
       {{ loading ? 'Please wait...' : 'Login' }}
     </button>
+    <button class="secondary" type="button" (click)="continueAsGuest()" [disabled]="loading">
+      Continue as Guest
+    </button>
     <p class="hint"><a routerLink="/forgot-password">Forgot password?</a></p>
     <p class="hint">
       New user? <a routerLink="/register">Create an account</a>

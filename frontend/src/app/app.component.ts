@@ -35,4 +35,8 @@ export class AppComponent {
   closeMenu(): void {
     this.menuOpen = false;
   }
+
+  guestLogoutLabel(): string {
+    return this.authService.isGuest ? 'Exit Guest Mode' : 'Logout';
+  }
 }

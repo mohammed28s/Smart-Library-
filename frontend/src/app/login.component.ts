@@ -29,6 +29,8 @@ export class LoginComponent {
   ) {
     if (this.authService.isAuthenticated) {
       this.router.navigateByUrl('/dashboard');
+    } else if (this.authService.isGuest) {
+      this.router.navigateByUrl('/books');
     }
 
     this.route.queryParamMap.subscribe((params) => {
@@ -66,6 +68,12 @@ export class LoginComponent {
           this.loading = false;
         }
       });
+  }
+
+  continueAsGuest(): void {
+    this.authService.continueAsGuest();
+    this.toastService.info('Guest mode enabled. You can browse books.');
+    this.router.navigateByUrl('/books');
   }
 
   private clearMessages(): void {

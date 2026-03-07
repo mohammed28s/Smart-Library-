@@ -1,5 +1,5 @@
 <main class="layout">
-  <aside class="sidebar" [class.open]="menuOpen" *ngIf="authService.isAuthenticated">
+  <aside class="sidebar" [class.open]="menuOpen" *ngIf="authService.isSessionActive">
     <div class="brand">
       <p class="kicker">Platform</p>
       <h1>{{ title }}</h1>
@@ -7,17 +7,29 @@
     </div>
 
     <nav class="menu">
-      <a routerLink="/dashboard" routerLinkActive="active" (click)="closeMenu()">Dashboard</a>
+      <a routerLink="/dashboard" routerLinkActive="active" *ngIf="authService.isAuthenticated" (click)="closeMenu()">
+        Dashboard
+      </a>
       <a routerLink="/books" routerLinkActive="active" (click)="closeMenu()">Books</a>
-      <a routerLink="/orders" routerLinkActive="active" (click)="closeMenu()">Orders</a>
-      <a routerLink="/order-items" routerLinkActive="active" (click)="closeMenu()">Order Items</a>
-      <a routerLink="/payments" routerLinkActive="active" (click)="closeMenu()">Payments</a>
-      <a routerLink="/users" routerLinkActive="active" *ngIf="authService.role === 'WORKER'" (click)="closeMenu()">
+      <a routerLink="/orders" routerLinkActive="active" *ngIf="authService.isAuthenticated" (click)="closeMenu()">
+        Orders
+      </a>
+      <a routerLink="/order-items" routerLinkActive="active" *ngIf="authService.isAuthenticated" (click)="closeMenu()">
+        Order Items
+      </a>
+      <a routerLink="/payments" routerLinkActive="active" *ngIf="authService.isAuthenticated" (click)="closeMenu()">
+        Payments
+      </a>
+      <a
+        routerLink="/users"
+        routerLinkActive="active"
+        *ngIf="authService.isAuthenticated && authService.role === 'WORKER'"
+        (click)="closeMenu()">
         Users
       </a>
     </nav>
 
-    <button class="logout" type="button" (click)="logout()">Logout</button>
+    <button class="logout" type="button" (click)="logout()">{{ guestLogoutLabel() }}</button>
   </aside>
 
   <section class="content">
@@ -25,7 +37,7 @@
       <button
         class="menu-btn"
         type="button"
-        *ngIf="authService.isAuthenticated"
+        *ngIf="authService.isSessionActive"
         (click)="menuOpen = !menuOpen">
         Menu
       </button>
