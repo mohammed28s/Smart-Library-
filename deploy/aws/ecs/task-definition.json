@@ -1,0 +1,86 @@
+{
+  "family": "smartlibrary",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/smartlibraryTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "backend",
+      "image": "<ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/smartlibrary-backend:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "JWT_SECRET", "value": "<REPLACE_IN_SECRETS_MANAGER>" },
+        { "name": "SMS_MODE", "value": "mock" },
+        { "name": "DEEPSEEK_BASE_URL", "value": "https://api.deepseek.com" },
+        { "name": "DEEPSEEK_MODEL", "value": "deepseek-chat" }
+      ],
+      "secrets": [
+        { "name": "TWILIO_ACCOUNT_SID", "valueFrom": "arn:aws:secretsmanager:<REGION>:<ACCOUNT_ID>:secret:smartlibrary/twilio" },
+        { "name": "TWILIO_AUTH_TOKEN", "valueFrom": "arn:aws:secretsmanager:<REGION>:<ACCOUNT_ID>:secret:smartlibrary/twilio" },
+        { "name": "TWILIO_FROM_NUMBER", "valueFrom": "arn:aws:secretsmanager:<REGION>:<ACCOUNT_ID>:secret:smartlibrary/twilio" },
+        { "name": "DEEPSEEK_API_KEY", "valueFrom": "arn:aws:secretsmanager:<REGION>:<ACCOUNT_ID>:secret:smartlibrary/deepseek" }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "smartlibrary-data",
+          "containerPath": "/app/data",
+          "readOnly": false
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/smartlibrary",
+          "awslogs-region": "<REGION>",
+          "awslogs-stream-prefix": "backend"
+        }
+      }
+    },
+    {
+      "name": "frontend",
+      "image": "<ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/smartlibrary-frontend:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "hostPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+      "dependsOn": [
+        {
+          "containerName": "backend",
+          "condition": "START"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/smartlibrary",
+          "awslogs-region": "<REGION>",
+          "awslogs-stream-prefix": "frontend"
+        }
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "name": "smartlibrary-data",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "<EFS_FILE_SYSTEM_ID>",
+        "rootDirectory": "/smartlibrary",
+        "transitEncryption": "ENABLED"
+      }
+    }
+  ]
+}

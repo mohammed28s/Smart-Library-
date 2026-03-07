@@ -1,0 +1,50 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "backend",
+      "image": "<ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/smartlibrary-backend:latest",
+      "essential": true,
+      "memory": 1024,
+      "portMappings": [
+        {
+          "hostPort": 8080,
+          "containerPort": 8080
+        }
+      ],
+      "environment": [
+        { "name": "JWT_SECRET", "value": "<SET_IN_EB_ENV>" },
+        { "name": "SMS_MODE", "value": "mock" },
+        { "name": "DEEPSEEK_BASE_URL", "value": "https://api.deepseek.com" },
+        { "name": "DEEPSEEK_MODEL", "value": "deepseek-chat" }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "backend-data",
+          "containerPath": "/app/data"
+        }
+      ]
+    },
+    {
+      "name": "frontend",
+      "image": "<ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/smartlibrary-frontend:latest",
+      "essential": true,
+      "memory": 512,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
+        }
+      ],
+      "links": ["backend"]
+    }
+  ],
+  "volumes": [
+    {
+      "name": "backend-data",
+      "host": {
+        "sourcePath": "/var/app/smartlibrary/data"
+      }
+    }
+  ]
+}
