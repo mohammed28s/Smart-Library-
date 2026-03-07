@@ -65,6 +65,7 @@ public class SqliteSchemaMigration implements ApplicationRunner {
                   FOREIGN KEY(user_id) REFERENCES users(id)
                 )
                 """);
+        seedBooksIfEmpty();
     }
 
     private void executeWithRetry(String sql) {
@@ -87,5 +88,24 @@ public class SqliteSchemaMigration implements ApplicationRunner {
                 }
             }
         }
+    }
+
+    private void seedBooksIfEmpty() {
+        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM books", Integer.class);
+        if (count != null && count > 0) {
+            return;
+        }
+
+        executeWithRetry("""
+                INSERT INTO books (title, author, isbn, price, stock, description) VALUES
+                ('Clean Code', 'Robert C. Martin', '9780132350884', 24.99, 15, 'A handbook of agile software craftsmanship and coding best practices.'),
+                ('The Pragmatic Programmer', 'Andrew Hunt, David Thomas', '9780135957059', 29.99, 12, 'Practical software engineering habits for modern developers.'),
+                ('Atomic Habits', 'James Clear', '9780735211292', 18.50, 20, 'A practical framework for building good habits and breaking bad ones.'),
+                ('Deep Work', 'Cal Newport', '9781455586691', 17.25, 10, 'Rules for focused success in a distracted world.'),
+                ('1984', 'George Orwell', '9780451524935', 11.90, 25, 'Classic dystopian novel about surveillance and freedom.'),
+                ('To Kill a Mockingbird', 'Harper Lee', '9780061120084', 12.75, 18, 'A timeless novel of justice, empathy, and courage.'),
+                ('The Alchemist', 'Paulo Coelho', '9780061122415', 10.40, 22, 'Inspirational story about purpose and personal legend.'),
+                ('Sapiens', 'Yuval Noah Harari', '9780062316097', 21.30, 14, 'A brief history of humankind from evolution to modern society.')
+                """);
     }
 }
