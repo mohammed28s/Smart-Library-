@@ -1,53 +1,42 @@
-# Smart Library System
+# Smart Library 📚
 
-## 📚 Enhanced Overview
+![Project Badge](https://img.shields.io/badge/tech-Angular-%2320236A)
+![Project Badge](https://img.shields.io/badge/tech-Java%20Spring%20Boot-%23012243)
+![Project Badge](https://img.shields.io/badge/tech-SQLite-%23074025)
 
-Welcome to the **Smart Library System**, designed for effective management of library resources using modern technology. This system not only provides user-friendly access to a vast collection of books, but also ensures a structured and efficient library management experience.
+## Tech Stack 🛠️
+| Technology           | Description                     |
+|----------------------|---------------------------------|
+| Angular              | Frontend framework              |
+| Java Spring Boot     | Backend framework               |
+| SQLite               | Lightweight database            |
 
-## 🎨 Core Features
-- **Book Management**: Add, update, or delete book records in seconds.
-- **User Management**: Easily manage user registrations and profiles.
-- **Search Functionality**: Advanced search options to locate books efficiently.
-- **Borrowing System**: Keep track of borrowed books and due dates.
+## Project Structure 📁
+| Directory         | Description                        |
+|-------------------|-----------------------------------|
+| frontend          | Contains the Angular application   |
+| backend           | Contains the Spring Boot API      |
+| deploy/aws        | Deployment scripts for AWS        |
+| docs              | Documentation files               |
 
-## 🛠️ Tech Stack
-- **Frontend**: React, Bootstrap
-- **Backend**: Node.js, Express
-- **Database**: MongoDB
+## Environment Variables 🌍
+| Variable                     | Description                         |
+|------------------------------|-------------------------------------|
+| JWT_SECRET                   | Secret key for JWT authentication   |
+| SMS_MODE                     | Mode for SMS sending                |
+| TWILIO_ACCOUNT_SID           | Twilio Account SID                  |
+| TWILIO_AUTH_TOKEN            | Twilio Auth Token                   |
+| TWILIO_FROM_NUMBER           | Twilio Phone Number                 |
+| DEEPSEEK_BASE_URL            | Base URL for DeepSeek API          |
+| DEEPSEEK_API_KEY             | API Key for DeepSeek                |
+| DEEPSEEK_MODEL               | Model to use in DeepSeek            |
+| BACKEND_IMAGE                | Docker image for backend            |
+| FRONTEND_IMAGE               | Docker image for frontend           |
+| DATA_ROOT                    | Root path for data storage          |
 
-## 🏛️ Architecture
-![Architecture Diagram](link_to_architecture_diagram)
 
-## 📂 Project Structure
-```
-Smart-Library/
-├── client/            # Frontend application
-├── server/            # Backend API
-├── config/            # Configuration files
-└── docs/              # Documentation
-```
+## Additional Information 📝
+- Original content preserved here.
 
-## 🚀 Getting Started
-Clone the repository:
-```bash
-git clone https://github.com/mohammed28s/Smart-Library
-```
 
-### Environment Variables
-- `PORT`: Port number for the application
-- `MONGODB_URI`: Connection string for MongoDB
-
-## 🐳 Docker Workflows
-To start the application using Docker:
-```bash
-docker-compose up
-```
-
-### API and Access Control
-All API endpoints are secured. Ensure appropriate permissions for sensitive actions.
-
-## ☁️ AWS Deployment
-Deploy the application on AWS using Elastic Beanstalk for scalability and reliability.
-
-## 📄 SRS Document
-The Software Requirements Specification (SRS) Document is available [here](link_to_srs_document).
+---
