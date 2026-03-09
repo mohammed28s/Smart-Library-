@@ -3,8 +3,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
-import { Book } from './api.models';
+import { Appointment, Book, ContactRequest, ReadingRoom } from './api.models';
 import { BooksService } from './books.service';
+import { BookingService } from './booking.service';
+import { ContactService } from './contact.service';
 import { ToastService } from './toast.service';
 
 interface BookView extends Book {
@@ -34,6 +36,30 @@ export class BooksComponent implements OnInit, OnDestroy {
   editingId: number | null = null;
   saving = false;
 
+  rooms: ReadingRoom[] = [];
+  appointments: Appointment[] = [];
+  bookingLoading = false;
+  bookingSuccess = '';
+  bookingError = '';
+  appointmentPayload: Appointment = {
+    visitorName: '',
+    visitorEmail: '',
+    roomId: 0,
+    purpose: '',
+    notes: '',
+    startTime: '',
+    endTime: ''
+  };
+  contactForm: ContactRequest = {
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  };
+  contactLoading = false;
+  contactSuccess = '';
+  contactError = '';
+
   get canManageBooks(): boolean {
     return this.authService.isAuthenticated;
   }
@@ -42,11 +68,15 @@ export class BooksComponent implements OnInit, OnDestroy {
     private readonly booksService: BooksService,
     private readonly authService: AuthService,
     private readonly router: Router,
+    private readonly bookingService: BookingService,
+    private readonly contactService: ContactService,
     private readonly toastService: ToastService
   ) {}
 
   ngOnInit(): void {
     this.loadBooks();
+    this.loadRooms();
+    this.loadAppointments();
   }
 
   ngOnDestroy(): void {
@@ -92,6 +122,31 @@ export class BooksComponent implements OnInit, OnDestroy {
           return;
         }
         this.errorMessage = error?.error?.error || 'Failed to load books.';
+      }
+    });
+  }
+
+  private loadRooms(): void {
+    this.bookingService.getRooms().subscribe({
+      next: (rooms) => {
+        this.rooms = rooms;
+        if (!this.appointmentPayload.roomId && rooms.length) {
+          this.appointmentPayload.roomId = rooms[0].id ?? 0;
+        }
+      },
+      error: () => {
+        this.toastService.error('Failed to fetch rooms.');
+      }
+    });
+  }
+
+  private loadAppointments(): void {
+    this.bookingService.getAppointments().subscribe({
+      next: (appointments) => {
+        this.appointments = appointments;
+      },
+      error: () => {
+        this.toastService.error('Failed to fetch appointments.');
       }
     });
   }
@@ -264,6 +319,80 @@ export class BooksComponent implements OnInit, OnDestroy {
     }
   }
 
+  bookAppointment(): void {
+    this.bookingSuccess = '';
+    this.bookingError = '';
+    if (!this.appointmentPayload.roomId) {
+      this.bookingError = 'Select a room.';
+      return;
+    }
+    if (!this.appointmentPayload.startTime || !this.appointmentPayload.endTime) {
+      this.bookingError = 'Start and end time are required.';
+      return;
+    }
+    if (this.appointmentPayload.startTime >= this.appointmentPayload.endTime) {
+      this.bookingError = 'Start time must be before end time.';
+      return;
+    }
+
+    this.bookingLoading = true;
+    const payload: Appointment = { ...this.appointmentPayload };
+    this.bookingService.createAppointment(payload).subscribe({
+      next: () => {
+        this.bookingSuccess = 'Appointment confirmed. See you at the room!';
+        this.bookingLoading = false;
+        this.resetAppointmentPayload();
+        this.loadAppointments();
+      },
+      error: (error) => {
+        this.bookingLoading = false;
+        this.bookingError = error?.error?.error || 'Failed to book the reading room.';
+      }
+    });
+  }
+
+  sendContact(): void {
+    this.contactSuccess = '';
+    this.contactError = '';
+    if (!this.contactForm.name || !this.contactForm.email || !this.contactForm.subject || !this.contactForm.message) {
+      this.contactError = 'All fields are required.';
+      return;
+    }
+    this.contactLoading = true;
+    this.contactService.sendMessage(this.contactForm).subscribe({
+      next: () => {
+        this.contactSuccess = 'Thanks! We will respond to your email shortly.';
+        this.contactLoading = false;
+        this.resetContactForm();
+      },
+      error: () => {
+        this.contactLoading = false;
+        this.contactError = 'Unable to send your message. Please try again later.';
+      }
+    });
+  }
+
+  private resetAppointmentPayload(): void {
+    this.appointmentPayload = {
+      visitorName: '',
+      visitorEmail: '',
+      roomId: this.rooms[0]?.id ?? 0,
+      purpose: '',
+      notes: '',
+      startTime: '',
+      endTime: ''
+    };
+  }
+
+  private resetContactForm(): void {
+    this.contactForm = {
+      name: '',
+      email: '',
+      subject: '',
+      message: ''
+    };
+  }
+
   private decorateBook(book: Book): BookView {
     const normalizedTitle = book.title?.trim() ?? '';
     const coverUrl = this.coverUrls[normalizedTitle];
@@ -277,5 +406,22 @@ export class BooksComponent implements OnInit, OnDestroy {
         )}`,
       palette: gradient
     };
+  }
+
+  displayDate(value?: string | null): string {
+    if (!value) {
+      return '—';
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+    return date.toLocaleString(undefined, {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 }

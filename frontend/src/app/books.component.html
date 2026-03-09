@@ -23,6 +23,115 @@
           <p class="mb-0">Layout guided by Figma prototypes and UX polish; bootstrap spacing keeps everything consistent.</p>
         </div>
       </div>
+  </div>
+    <div class="row g-4 mt-4">
+      <div class="col-lg-6">
+        <div class="card shadow-sm border-0 booking-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <p class="eyebrow mb-1">Book a Room</p>
+                <h3 class="h5 mb-0">Reserve a reading table</h3>
+              </div>
+              <span class="badge bg-gradient rounded-pill">{{ rooms.length }} rooms</span>
+            </div>
+
+            <div *ngIf="bookingError" class="alert alert-danger">{{ bookingError }}</div>
+            <div *ngIf="bookingSuccess" class="alert alert-success">{{ bookingSuccess }}</div>
+
+            <div class="mb-3">
+              <label class="form-label">Your name</label>
+              <input class="form-control" [(ngModel)]="appointmentPayload.visitorName" name="visitorName" type="text" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input class="form-control" [(ngModel)]="appointmentPayload.visitorEmail" name="visitorEmail" type="email" />
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label">Room</label>
+                <select class="form-select" [(ngModel)]="appointmentPayload.roomId" name="roomId">
+                  <option *ngFor="let room of rooms" [value]="room.id">{{ room.name }} ({{ room.capacity }} seats)</option>
+                </select>
+                <small class="text-muted" *ngIf="!rooms.length">Rooms will appear upon the next synchronization.</small>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Purpose</label>
+                <input class="form-control" [(ngModel)]="appointmentPayload.purpose" name="purpose" type="text" />
+              </div>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col">
+                <label class="form-label">Start</label>
+                <input class="form-control" [(ngModel)]="appointmentPayload.startTime" name="startTime" type="datetime-local" />
+              </div>
+              <div class="col">
+                <label class="form-label">End</label>
+                <input class="form-control" [(ngModel)]="appointmentPayload.endTime" name="endTime" type="datetime-local" />
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Notes</label>
+              <textarea class="form-control" rows="2" [(ngModel)]="appointmentPayload.notes" name="notes"></textarea>
+            </div>
+            <button class="btn btn-gradient w-100" type="button" (click)="bookAppointment()" [disabled]="bookingLoading">
+              {{ bookingLoading ? 'Booking...' : 'Reserve the room' }}
+            </button>
+
+            <div class="mt-4">
+              <p class="eyebrow mb-2">Upcoming visits</p>
+              <div *ngIf="!appointments.length" class="text-muted fst-italic">No appointments yet.</div>
+              <div class="list-group" *ngIf="appointments.length">
+                <div class="list-group-item border-0 px-0 pb-3" *ngFor="let appointment of appointments">
+                  <div class="d-flex justify-content-between">
+                    <strong>{{ appointment.roomName }}</strong>
+                    <small>{{ displayDate(appointment.startTime) }}</small>
+                  </div>
+                  <p class="mb-1 text-white-75">{{ appointment.purpose }}</p>
+                  <small class="text-muted">{{ appointment.visitorName }} • {{ appointment.visitorEmail }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card shadow-sm border-0 contact-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <p class="eyebrow mb-1">Need help?</p>
+                <h3 class="h5 mb-0">Ask us anything</h3>
+              </div>
+              <span class="badge bg-secondary rounded-pill">Email</span>
+            </div>
+
+            <div *ngIf="contactError" class="alert alert-danger">{{ contactError }}</div>
+            <div *ngIf="contactSuccess" class="alert alert-success">{{ contactSuccess }}</div>
+
+            <div class="mb-3">
+              <label class="form-label">Name</label>
+              <input class="form-control" [(ngModel)]="contactForm.name" name="contactName" type="text" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input class="form-control" [(ngModel)]="contactForm.email" name="contactEmail" type="email" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Subject</label>
+              <input class="form-control" [(ngModel)]="contactForm.subject" name="contactSubject" type="text" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Message</label>
+              <textarea class="form-control" rows="4" [(ngModel)]="contactForm.message" name="contactMessage"></textarea>
+            </div>
+            <button class="btn btn-outline-primary w-100" type="button" (click)="sendContact()" [disabled]="contactLoading">
+              {{ contactLoading ? 'Sending...' : 'Send message' }}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>

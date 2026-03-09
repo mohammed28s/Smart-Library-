@@ -65,7 +65,42 @@ public class SqliteSchemaMigration implements ApplicationRunner {
                   FOREIGN KEY(user_id) REFERENCES users(id)
                 )
                 """);
+        executeWithRetry("""
+                CREATE TABLE IF NOT EXISTS reading_rooms (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  name TEXT UNIQUE NOT NULL,
+                  description TEXT,
+                  capacity INTEGER DEFAULT 6
+                )
+                """);
+        executeWithRetry("""
+                CREATE TABLE IF NOT EXISTS appointments (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  user_id INTEGER,
+                  room_id INTEGER NOT NULL,
+                  visitor_name TEXT NOT NULL,
+                  visitor_email TEXT NOT NULL,
+                  purpose TEXT NOT NULL,
+                  notes TEXT,
+                  start_time TEXT NOT NULL,
+                  end_time TEXT NOT NULL,
+                  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                  FOREIGN KEY(user_id) REFERENCES users(id),
+                  FOREIGN KEY(room_id) REFERENCES reading_rooms(id)
+                )
+                """);
+        executeWithRetry("""
+                CREATE TABLE IF NOT EXISTS contact_messages (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  name TEXT NOT NULL,
+                  email TEXT NOT NULL,
+                  subject TEXT NOT NULL,
+                  message TEXT NOT NULL,
+                  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+                """);
         seedBooksIfEmpty();
+        seedRoomsIfEmpty();
     }
 
     private void executeWithRetry(String sql) {
@@ -106,6 +141,20 @@ public class SqliteSchemaMigration implements ApplicationRunner {
                 ('To Kill a Mockingbird', 'Harper Lee', '9780061120084', 12.75, 18, 'A timeless novel of justice, empathy, and courage.'),
                 ('The Alchemist', 'Paulo Coelho', '9780061122415', 10.40, 22, 'Inspirational story about purpose and personal legend.'),
                 ('Sapiens', 'Yuval Noah Harari', '9780062316097', 21.30, 14, 'A brief history of humankind from evolution to modern society.')
+                """);
+    }
+
+    private void seedRoomsIfEmpty() {
+        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM reading_rooms", Integer.class);
+        if (count != null && count > 0) {
+            return;
+        }
+
+        executeWithRetry("""
+                INSERT INTO reading_rooms (name, description, capacity) VALUES
+                ('Aurora Loft', 'Natural light and greenery for reflective reading.', 8),
+                ('Harbor Suite', 'Cozy nook with acoustic walls and plush chairs.', 6),
+                ('Skyline Terrace', 'Panoramic windows with city views and standing desks.', 10)
                 """);
     }
 }

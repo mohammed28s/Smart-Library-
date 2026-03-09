@@ -67,3 +67,35 @@ export interface RevenueMetrics {
   purchaseCount: number;
   rentalCount: number;
 }
+
+export interface ReadingRoom {
+  id?: number;
+  name: string;
+  description?: string | null;
+  capacity?: number;
+}
+
+export interface Appointment {
+  id?: number;
+  visitorName: string;
+  visitorEmail: string;
+  roomId: number;
+  roomName?: string | null;
+  purpose: string;
+  notes?: string | null;
+  startTime: string;
+  endTime: string;
+  createdAt?: string | null;
+}
+
+export interface ContactRequest {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+export interface ContactResponse extends ContactRequest {
+  id?: number;
+  createdAt?: string | null;
+}

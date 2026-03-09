@@ -69,6 +69,40 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
   FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
+-- Reading rooms
+CREATE TABLE IF NOT EXISTS reading_rooms (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT UNIQUE NOT NULL,
+  description TEXT,
+  capacity INTEGER DEFAULT 6
+);
+
+-- Appointments for reading rooms
+CREATE TABLE IF NOT EXISTS appointments (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  room_id INTEGER NOT NULL,
+  visitor_name TEXT NOT NULL,
+  visitor_email TEXT NOT NULL,
+  purpose TEXT NOT NULL,
+  notes TEXT,
+  start_time TEXT NOT NULL,
+  end_time TEXT NOT NULL,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(user_id) REFERENCES users(id),
+  FOREIGN KEY(room_id) REFERENCES reading_rooms(id)
+);
+
+-- Contact messages
+CREATE TABLE IF NOT EXISTS contact_messages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  subject TEXT NOT NULL,
+  message TEXT NOT NULL,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Assistant feedback
 CREATE TABLE IF NOT EXISTS assistant_feedback (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
