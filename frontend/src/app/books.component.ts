@@ -10,6 +10,8 @@ import { ToastService } from './toast.service';
 interface BookView extends Book {
   barcodeImageUrl?: string;
   barcodeLoading?: boolean;
+  coverUrl?: string;
+  palette?: string;
 }
 
 @Component({
@@ -51,6 +53,26 @@ export class BooksComponent implements OnInit, OnDestroy {
     this.revokeBarcodeUrls();
   }
 
+  private readonly coverUrls: Record<string, string> = {
+    'Clean Code': 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=700&q=80',
+    'The Pragmatic Programmer': 'https://images.unsplash.com/photo-1529489078054-0b70cd9af1f6?auto=format&fit=crop&w=700&q=80',
+    'Atomic Habits': 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=700&q=80',
+    'Deep Work': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=700&q=80',
+    '1984': 'https://images.unsplash.com/photo-1529218164290-54c2d6c46c60?auto=format&fit=crop&w=700&q=80',
+    'To Kill a Mockingbird': 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=700&q=80',
+    'The Alchemist': 'https://images.unsplash.com/photo-1448932223592-d1fc686e76ea?auto=format&fit=crop&w=700&q=80',
+    'Sapiens': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=700&q=80'
+  };
+
+  private readonly gradientPresets = [
+    'linear-gradient(135deg, #0575E6, #00F2FE)',
+    'linear-gradient(135deg, #7F00FF, #E100FF)',
+    'linear-gradient(135deg, #FF4E50, #F9D423)',
+    'linear-gradient(135deg, #00B4DB, #0083B0)',
+    'linear-gradient(135deg, #FFAF7B, #D76D77)',
+    'linear-gradient(135deg, #00C9FF, #92FE9D)'
+  ];
+
   loadBooks(): void {
     this.booksLoading = true;
     this.errorMessage = '';
@@ -58,7 +80,7 @@ export class BooksComponent implements OnInit, OnDestroy {
     this.booksService.getBooks().subscribe({
       next: (books) => {
         this.revokeBarcodeUrls();
-        this.books = books.map((book) => ({ ...book }));
+        this.books = books.map((book) => this.decorateBook(book));
         this.page = 1;
         this.booksLoading = false;
       },
@@ -240,5 +262,20 @@ export class BooksComponent implements OnInit, OnDestroy {
         URL.revokeObjectURL(book.barcodeImageUrl);
       }
     }
+  }
+
+  private decorateBook(book: Book): BookView {
+    const normalizedTitle = book.title?.trim() ?? '';
+    const coverUrl = this.coverUrls[normalizedTitle];
+    const gradient = this.gradientPresets[(book.id ?? 0) % this.gradientPresets.length];
+    return {
+      ...book,
+      coverUrl:
+        coverUrl ??
+        `https://images.unsplash.com/photo-1473186578172-c1414e5c22d0?auto=format&fit=crop&w=700&q=80&title=${encodeURIComponent(
+          normalizedTitle
+        )}`,
+      palette: gradient
+    };
   }
 }
