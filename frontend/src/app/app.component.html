@@ -14,10 +14,18 @@
       <a routerLink="/orders" routerLinkActive="active" *ngIf="authService.isAuthenticated" (click)="closeMenu()">
         Orders
       </a>
-      <a routerLink="/order-items" routerLinkActive="active" *ngIf="authService.isAuthenticated" (click)="closeMenu()">
+      <a
+        routerLink="/order-items"
+        routerLinkActive="active"
+        *ngIf="authService.isAuthenticated && authService.role === 'WORKER'"
+        (click)="closeMenu()">
         Order Items
       </a>
-      <a routerLink="/payments" routerLinkActive="active" *ngIf="authService.isAuthenticated" (click)="closeMenu()">
+      <a
+        routerLink="/payments"
+        routerLinkActive="active"
+        *ngIf="authService.isAuthenticated && authService.role === 'WORKER'"
+        (click)="closeMenu()">
         Payments
       </a>
       <a

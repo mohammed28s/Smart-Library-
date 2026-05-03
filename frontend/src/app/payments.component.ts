@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Payment, PaymentStatus } from './api.models';
+import { AuthService } from './auth.service';
 import { PaymentsService } from './payments.service';
 import { ToastService } from './toast.service';
 
@@ -28,6 +29,7 @@ export class PaymentsComponent implements OnInit {
 
   constructor(
     private readonly paymentsService: PaymentsService,
+    private readonly authService: AuthService,
     private readonly toastService: ToastService
   ) {}
 
@@ -110,6 +112,10 @@ export class PaymentsComponent implements OnInit {
     this.form = this.emptyPayment();
   }
 
+  get isWorker(): boolean {
+    return this.authService.role === 'WORKER';
+  }
+
   private emptyPayment(): Payment {
     return {
       orderId: 1,
@@ -122,13 +128,21 @@ export class PaymentsComponent implements OnInit {
 
   get filteredPayments(): Payment[] {
     const q = this.search.trim().toLowerCase();
-    if (!q) return this.payments;
-    return this.payments.filter((payment) =>
+    let list = this.payments;
+
+    // Normal users shouldn't see all payments.
+    if (!this.isWorker) {
+      list = []; // Simple protection for demo
+    }
+
+    if (!q) return list;
+    return list.filter((payment) =>
       [payment.id, payment.orderId, payment.provider, payment.status, payment.providerPaymentId]
         .filter((v) => v !== undefined && v !== null)
         .some((value) => String(value).toLowerCase().includes(q))
     );
   }
+
 
   get pagedPayments(): Payment[] {
     const start = (this.page - 1) * this.pageSize;

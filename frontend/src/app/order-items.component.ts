@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { OrderItem } from './api.models';
+import { AuthService } from './auth.service';
 import { OrderItemsService } from './order-items.service';
 import { ToastService } from './toast.service';
 
@@ -27,6 +28,7 @@ export class OrderItemsComponent implements OnInit {
 
   constructor(
     private readonly orderItemsService: OrderItemsService,
+    private readonly authService: AuthService,
     private readonly toastService: ToastService
   ) {}
 
@@ -109,6 +111,10 @@ export class OrderItemsComponent implements OnInit {
     this.form = this.emptyItem();
   }
 
+  get isWorker(): boolean {
+    return this.authService.role === 'WORKER';
+  }
+
   private emptyItem(): OrderItem {
     return {
       orderId: 1,
@@ -120,13 +126,21 @@ export class OrderItemsComponent implements OnInit {
 
   get filteredItems(): OrderItem[] {
     const q = this.search.trim().toLowerCase();
-    if (!q) return this.items;
-    return this.items.filter((item) =>
+    let list = this.items;
+
+    // Normal users shouldn't see all items.
+    if (!this.isWorker) {
+      list = []; // Simple protection for demo
+    }
+
+    if (!q) return list;
+    return list.filter((item) =>
       [item.id, item.orderId, item.bookId, item.quantity, item.price]
         .filter((v) => v !== undefined && v !== null)
         .some((value) => String(value).toLowerCase().includes(q))
     );
   }
+
 
   get pagedItems(): OrderItem[] {
     const start = (this.page - 1) * this.pageSize;

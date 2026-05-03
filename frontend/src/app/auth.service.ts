@@ -29,6 +29,7 @@ export interface AuthMessageResponse {
 export class AuthService {
   private readonly apiBaseUrl = '';
   private readonly tokenKey = 'smartlibrary_token';
+  private readonly userIdKey = 'smartlibrary_userid';
   private readonly usernameKey = 'smartlibrary_username';
   private readonly roleKey = 'smartlibrary_role';
   private readonly guestKey = 'smartlibrary_guest';
@@ -40,6 +41,10 @@ export class AuthService {
 
   get token(): string {
     return this.tokenSubject.value;
+  }
+
+  get userId(): number {
+    return Number(localStorage.getItem(this.userIdKey) ?? 0);
   }
 
   get username(): string {
@@ -105,6 +110,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.userIdKey);
     localStorage.removeItem(this.usernameKey);
     localStorage.removeItem(this.roleKey);
     localStorage.removeItem(this.guestKey);
@@ -113,6 +119,7 @@ export class AuthService {
 
   continueAsGuest(): void {
     localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.userIdKey);
     localStorage.setItem(this.usernameKey, 'Guest');
     localStorage.setItem(this.roleKey, 'GUEST');
     localStorage.setItem(this.guestKey, '1');
@@ -121,6 +128,7 @@ export class AuthService {
 
   private storeAuth(response: AuthResponse): void {
     localStorage.setItem(this.tokenKey, response.token);
+    localStorage.setItem(this.userIdKey, String(response.userId));
     localStorage.setItem(this.usernameKey, response.username);
     localStorage.setItem(this.roleKey, response.role);
     localStorage.removeItem(this.guestKey);

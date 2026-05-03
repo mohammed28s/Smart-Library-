@@ -2,11 +2,15 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { switchMap } from 'rxjs';
 import { AuthService } from './auth.service';
-import { Appointment, Book, ContactRequest, ReadingRoom } from './api.models';
+import { Appointment, Book, ContactRequest, LibraryOrder, OrderItem, Payment, ReadingRoom } from './api.models';
 import { BooksService } from './books.service';
 import { BookingService } from './booking.service';
 import { ContactService } from './contact.service';
+import { OrdersService } from './orders.service';
+import { OrderItemsService } from './order-items.service';
+import { PaymentsService } from './payments.service';
 import { ToastService } from './toast.service';
 
 interface BookView extends Book {
@@ -36,6 +40,12 @@ export class BooksComponent implements OnInit, OnDestroy {
   editingId: number | null = null;
   saving = false;
 
+  buyingBook: BookView | null = null;
+  rentingBook: BookView | null = null;
+  purchaseQuantity = 1;
+  rentalStartDate = '';
+  rentalEndDate = '';
+
   rooms: ReadingRoom[] = [];
   appointments: Appointment[] = [];
   bookingLoading = false;
@@ -61,6 +71,10 @@ export class BooksComponent implements OnInit, OnDestroy {
   contactError = '';
 
   get canManageBooks(): boolean {
+    return this.authService.isAuthenticated && this.authService.role === 'WORKER';
+  }
+
+  get canOrder(): boolean {
     return this.authService.isAuthenticated;
   }
 
@@ -70,6 +84,9 @@ export class BooksComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly bookingService: BookingService,
     private readonly contactService: ContactService,
+    private readonly ordersService: OrdersService,
+    private readonly orderItemsService: OrderItemsService,
+    private readonly paymentsService: PaymentsService,
     private readonly toastService: ToastService
   ) {}
 
@@ -153,7 +170,7 @@ export class BooksComponent implements OnInit, OnDestroy {
 
   submitBook(): void {
     if (!this.canManageBooks) {
-      this.errorMessage = 'Guest mode is read-only. Login to manage books.';
+      this.errorMessage = 'Guest mode or insufficient permissions. Login as worker to manage books.';
       this.toastService.info(this.errorMessage);
       return;
     }
@@ -192,7 +209,7 @@ export class BooksComponent implements OnInit, OnDestroy {
 
   startEdit(book: BookView): void {
     if (!this.canManageBooks) {
-      this.toastService.info('Guest mode is read-only. Login to edit books.');
+      this.toastService.info('Login as worker to edit books.');
       return;
     }
     this.editingId = book.id || null;
@@ -210,7 +227,7 @@ export class BooksComponent implements OnInit, OnDestroy {
 
   deleteBook(book: BookView): void {
     if (!this.canManageBooks) {
-      this.toastService.info('Guest mode is read-only. Login to delete books.');
+      this.toastService.info('Login as worker to delete books.');
       return;
     }
     if (!book.id || !confirm(`Delete "${book.title}"?`)) {
@@ -424,4 +441,129 @@ export class BooksComponent implements OnInit, OnDestroy {
       minute: '2-digit'
     });
   }
+
+  startPurchase(book: BookView): void {
+    if (!this.canOrder) {
+      this.toastService.info('Please login to buy books.');
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.buyingBook = book;
+    this.purchaseQuantity = 1;
+  }
+
+  startRental(book: BookView): void {
+    if (!this.canOrder) {
+      this.toastService.info('Please login to rent books.');
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.rentingBook = book;
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    this.rentalStartDate = tomorrow.toISOString().slice(0, 10);
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 8);
+    this.rentalEndDate = nextWeek.toISOString().slice(0, 10);
+  }
+
+  cancelOrderFlow(): void {
+    this.buyingBook = null;
+    this.rentingBook = null;
+  }
+
+  confirmPurchase(): void {
+    if (!this.buyingBook || !this.buyingBook.id) return;
+    this.saving = true;
+    const total = (this.buyingBook.price || 0) * this.purchaseQuantity;
+
+    const orderPayload: LibraryOrder = {
+      userId: this.authService.userId,
+      total,
+      status: 'PAID',
+      type: 'BUY'
+    };
+
+    this.ordersService.createOrder(orderPayload).pipe(
+      switchMap(order => {
+        const itemPayload: OrderItem = {
+          orderId: order.id!,
+          bookId: this.buyingBook!.id!,
+          quantity: this.purchaseQuantity,
+          price: this.buyingBook!.price
+        };
+        return this.orderItemsService.createOrderItem(itemPayload).pipe(
+          switchMap(() => {
+            const paymentPayload: Payment = {
+              orderId: order.id!,
+              provider: 'STRIPE_TEST',
+              amount: total,
+              status: 'SUCCEEDED'
+            };
+            return this.paymentsService.createPayment(paymentPayload);
+          })
+        );
+      })
+    ).subscribe({
+      next: () => {
+        this.toastService.success(`Successfully purchased ${this.purchaseQuantity} copy of "${this.buyingBook!.title}"!`);
+        this.buyingBook = null;
+        this.saving = false;
+        this.loadBooks();
+      },
+      error: (err) => {
+        this.toastService.error(err?.error?.error || 'Purchase failed.');
+        this.saving = false;
+      }
+    });
+  }
+
+  confirmRental(): void {
+    if (!this.rentingBook || !this.rentingBook.id) return;
+    this.saving = true;
+    const total = (this.rentingBook.price || 0) * 0.2; // 20% rental fee
+
+    const orderPayload: LibraryOrder = {
+      userId: this.authService.userId,
+      total,
+      status: 'PAID',
+      type: 'RENT',
+      rentalStartDate: this.rentalStartDate,
+      dueDate: this.rentalEndDate
+    };
+
+    this.ordersService.createOrder(orderPayload).pipe(
+      switchMap(order => {
+        const itemPayload: OrderItem = {
+          orderId: order.id!,
+          bookId: this.rentingBook!.id!,
+          quantity: 1,
+          price: total
+        };
+        return this.orderItemsService.createOrderItem(itemPayload).pipe(
+          switchMap(() => {
+            const paymentPayload: Payment = {
+              orderId: order.id!,
+              provider: 'STRIPE_TEST',
+              amount: total,
+              status: 'SUCCEEDED'
+            };
+            return this.paymentsService.createPayment(paymentPayload);
+          })
+        );
+      })
+    ).subscribe({
+      next: () => {
+        this.toastService.success(`Successfully rented "${this.rentingBook!.title}" until ${this.rentalEndDate}!`);
+        this.rentingBook = null;
+        this.saving = false;
+        this.loadBooks();
+      },
+      error: (err) => {
+        this.toastService.error(err?.error?.error || 'Rental failed.');
+        this.saving = false;
+      }
+    });
+  }
 }
+

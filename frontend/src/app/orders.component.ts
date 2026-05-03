@@ -215,8 +215,13 @@ export class OrdersComponent implements OnInit {
 
   get filteredOrders(): LibraryOrder[] {
     const q = this.search.trim().toLowerCase();
-    if (!q) return this.orders;
-    return this.orders.filter((order) =>
+    let list = this.orders;
+    if (!this.isWorker) {
+      const currentUserId = this.authService.userId;
+      list = list.filter((order) => order.userId === currentUserId);
+    }
+    if (!q) return list;
+    return list.filter((order) =>
       [order.id, order.userId, order.status, order.type, order.barcode]
         .filter((v) => v !== undefined && v !== null)
         .some((value) => String(value).toLowerCase().includes(q))

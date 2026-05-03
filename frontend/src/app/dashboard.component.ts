@@ -70,13 +70,20 @@ export class DashboardComponent implements OnInit {
       analytics: metricsRequest
     }).subscribe({
       next: ({ books, users, orders, orderItems, payments, analytics }) => {
+        const currentUserId = this.authService.userId;
+        const myOrders = this.isWorker ? orders : orders.filter(o => o.userId === currentUserId);
+        const myPayments = this.isWorker ? payments : payments.filter(p => {
+          const order = orders.find(o => o.id === p.orderId);
+          return order && order.userId === currentUserId;
+        });
+
         this.totalBooks = books.length;
         this.totalUsers = users.length;
-        this.totalOrders = orders.length;
-        this.totalOrderItems = orderItems.length;
-        this.totalPayments = payments.length;
+        this.totalOrders = myOrders.length;
+        this.totalOrderItems = orderItems.length; // Hard to filter without more logic
+        this.totalPayments = myPayments.length;
         this.inventoryValue = books.reduce((sum, b) => sum + (b.price || 0) * (b.stock || 0), 0);
-        this.totalPaidRevenue = payments
+        this.totalPaidRevenue = myPayments
           .filter((payment) => payment.status === 'SUCCEEDED')
           .reduce((sum, payment) => sum + (payment.amount || 0), 0);
 

@@ -242,6 +242,8 @@
                       <div class="btn-group w-100 mt-2">
                         <button class="btn btn-sm btn-light" type="button" (click)="startEdit(book)" *ngIf="canManageBooks">Edit</button>
                         <button class="btn btn-sm btn-outline-light" type="button" (click)="deleteBook(book)" *ngIf="canManageBooks">Delete</button>
+                        <button class="btn btn-sm btn-success" type="button" (click)="startPurchase(book)" *ngIf="!canManageBooks">Buy</button>
+                        <button class="btn btn-sm btn-primary" type="button" (click)="startRental(book)" *ngIf="!canManageBooks">Rent</button>
                         <button class="btn btn-sm btn-gradient text-white" type="button" (click)="loadBarcode(book)" [disabled]="book.barcodeLoading">
                           {{ book.barcodeLoading ? 'Loading...' : 'Barcode' }}
                         </button>
@@ -268,3 +270,60 @@
     </div>
   </div>
 </section>
+
+<!-- Purchase Modal/Overlay -->
+<div class="modal-overlay" *ngIf="buyingBook">
+  <div class="modal-content shadow-lg rounded-4 p-4 border-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="h4 mb-0">Checkout: {{ buyingBook.title }}</h3>
+      <button class="btn-close" (click)="cancelOrderFlow()"></button>
+    </div>
+    <div class="row align-items-center mb-4">
+      <div class="col-4">
+        <div class="book-image-small rounded-3" [style.backgroundImage]="'url(' + buyingBook.coverUrl + ')'"></div>
+      </div>
+      <div class="col-8">
+        <p class="mb-1 fw-bold">Price: {{ buyingBook.price | currency }}</p>
+        <div class="mb-3">
+          <label class="form-label small text-muted">Quantity</label>
+          <input type="number" class="form-control" [(ngModel)]="purchaseQuantity" min="1" [max]="buyingBook.stock || 10" />
+        </div>
+        <p class="h5 mb-0 text-primary">Total: {{ (buyingBook.price * purchaseQuantity) | currency }}</p>
+      </div>
+    </div>
+    <div class="alert alert-info small">This is a secure demo checkout. We use Stripe Test Provider.</div>
+    <button class="btn btn-gradient w-100 py-3 fw-bold" (click)="confirmPurchase()" [disabled]="saving">
+      {{ saving ? 'Processing...' : 'Complete Purchase' }}
+    </button>
+  </div>
+</div>
+
+<!-- Rental Modal/Overlay -->
+<div class="modal-overlay" *ngIf="rentingBook">
+  <div class="modal-content shadow-lg rounded-4 p-4 border-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="h4 mb-0">Rent: {{ rentingBook.title }}</h3>
+      <button class="btn-close" (click)="cancelOrderFlow()"></button>
+    </div>
+    <div class="row align-items-center mb-4">
+      <div class="col-4">
+        <div class="book-image-small rounded-3" [style.backgroundImage]="'url(' + rentingBook.coverUrl + ')'"></div>
+      </div>
+      <div class="col-8">
+        <p class="mb-1 fw-bold">Rental Fee: {{ (rentingBook.price * 0.2) | currency }} (20% of price)</p>
+        <div class="mb-3">
+          <label class="form-label small text-muted">Start Date</label>
+          <input type="date" class="form-control" [(ngModel)]="rentalStartDate" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label small text-muted">Due Date</label>
+          <input type="date" class="form-control" [(ngModel)]="rentalEndDate" />
+        </div>
+      </div>
+    </div>
+    <div class="alert alert-warning small">Late returns may incur additional fees.</div>
+    <button class="btn btn-primary w-100 py-3 fw-bold" (click)="confirmRental()" [disabled]="saving">
+      {{ saving ? 'Confirm Rental' : 'Confirm Rental' }}
+    </button>
+  </div>
+</div>
